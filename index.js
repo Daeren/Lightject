@@ -2,7 +2,7 @@
 //
 // Author: Daeren Torn
 // Site: 666.io
-// Version: 0.0.1
+// Version: 0.0.2
 //
 //-----------------------------------------------------
 
@@ -15,7 +15,8 @@ if(typeof(module) == "object") {
 //-----------------------------------------------------
 
 function $injector(f, binds) {
-    if(typeof(f) !== "function") return null;
+    if(typeof(f) !== "function")
+        return null;
 
     var strFunc     = f.toString(),
         strFuncArgs = strFunc.match(/^function\s*[^\(]*\(\s*([^\)]*)\)/m);
@@ -45,7 +46,7 @@ function $injector(f, binds) {
 
         while(i--) {
             arg = funcArgs[i];
-            callStack[i] = data[arg] || binds && binds[arg];
+            callStack[i] = data && data[arg] || binds && binds[arg];
         }
 
         return f.apply(ctx || f, callStack);
