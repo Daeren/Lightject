@@ -1,0 +1,41 @@
+{
+    "name": "lightject",
+    "version": "0.0.1",
+    "description": "Lightweight module for Dependency Injection",
+
+    "homepage": "http://666.io",
+    "keywords": [
+        "di",
+        "injection",
+        "dependency injection",
+		"fundamental",
+        "justdoit",
+		"injectality"
+    ],
+
+    "author": {
+        "name": "Daeren Torn",
+        "email": "x@db.gg"
+    },
+
+    "main": "./index",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/Daeren/Lightject.git"
+    },
+
+    "license": "MIT",
+    "engines": {
+        "node": ">= 0.8.0"
+    },
+
+    "readme": "",
+    "readmeFilename": "readme.md",
+
+    "bugs": {
+        "url": "https://github.com/Daeren/Lightject/issues"
+    },
+
+    "_id": "lightject@0.0.1",
+    "_from": "lightject@"
+}
