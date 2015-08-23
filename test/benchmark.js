@@ -13,22 +13,29 @@ require("./../index");
 
 //-----------------------------------------------------
 
-var l, fCookie;
+var l, data, fCookie;
 
 //-----------------------------------------------------
 
-fCookie = $injector(function($in, $out) { ($in); });
+function f13($in, $out) { ($in); }
 
+//-----)>
+
+fCookie = $injector(f13);
+
+//-----------------]>
 
 l = 1000 * 1000 * 1;
+data = {"$out": console.log, "$in": "Simple start 0"};
 
 console.time("#1 | with Data");
 
 while(l--)
-    fCookie({"$out": console.log, "$in": "Simple start 0"});
+    fCookie(data);
 
 console.timeEnd("#1 | with Data");
 
+//-----------------]>
 
 l = 1000 * 1000 * 1;
 
@@ -39,12 +46,38 @@ while(l--)
 
 console.timeEnd("#1 | without Data");
 
+//-----------------]>
 
 l = 1000 * 1000 * 1;
+data = {"$out": console.log};
 
-console.time("#3 | with Data");
+console.time("#3 | with Data (-1 arg)");
 
 while(l--)
-    fCookie({"$out": console.log});
+    fCookie(data);
 
-console.timeEnd("#3 | with Data");
+console.timeEnd("#3 | with Data (-1 arg)");
+
+//-----------------]>
+
+l = 1000 * 1000 * 1;
+data = {"$out": console.log};
+
+console.time("#4 | [$i].run: with Data");
+
+while(l--)
+    $injector.run(f13, data);
+
+console.timeEnd("#4 | [$i].run: with Data");
+
+//-----------------]>
+
+l = 1000 * 1000 * 1;
+data = null;
+
+console.time("#5 | [$i].run: without Data");
+
+while(l--)
+    $injector.run(f13, data);
+
+console.timeEnd("#5 | [$i].run: without Data");

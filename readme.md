@@ -7,23 +7,30 @@ require("lightject")
 var ctx = {
         "payload": "!"
     };
-	
+
 var binds = {
         "myBind": "?"
     };
-	
+
 var data = {
         "myBind": "Replace!",
-		
-        "$in": "Simple start",
-        "$out": console.log
-    };
-	
-var print = $injector(function($in, $out, myBind) {
-    $out($in + this.payload + myBind);
-}, binds);
 
+        "input":  "Simple start",
+        "output": console.log
+    };
+
+//-------------]>
+
+var print = $injector(fLog, binds);
 print(data, ctx);
+
+$injector.run(fLog, data, ctx);
+
+//-------------]>
+
+function fLog(input, output, myBind) {
+    output(input + this.payload + myBind);
+}
 ```
 
 * Benchmark: +

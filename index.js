@@ -2,7 +2,7 @@
 //
 // Author: Daeren Torn
 // Site: 666.io
-// Version: 0.0.2
+// Version: 0.0.3
 //
 //-----------------------------------------------------
 
@@ -11,6 +11,13 @@
 if(typeof(module) == "object") {
     module.exports = global.$injector = $injector;
 }
+
+//---------------]>
+
+$injector.run = function(f, data, ctx) {
+    f = $injector(f);
+    return f ? f(data, ctx) : f;
+};
 
 //-----------------------------------------------------
 

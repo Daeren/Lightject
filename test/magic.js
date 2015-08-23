@@ -13,19 +13,32 @@ require("./../index");
 
 //-----------------------------------------------------
 
-var func = function(x, y, z, t) { return x + y + z + t; };
+var ctx     = {t: 9},
+    binds   = {t: 100},
+    data    = {x: 1, y: 2, z: 3};
 
-func = $injector(func, {t: 9});
-console.log(func({x: 1, y: 2, z: 3}));
+var func    = function(x, y, z, t) { return x + y + z + (t || this.t); };
 
+//---------------------------]>
+
+console.log($injector.run(func, data, ctx));
+
+//------------]>
+
+func = $injector(func, binds);
+console.log(func(data));
+
+//------------]>
 
 func = function() { return this.t; };
 func.t = 6;
 
 func = $injector(func);
-console.log(func({x: 1, y: 2, z: 3}, {t: 1}));
+console.log(func(data, ctx));
+
+//------------]>
 
 func = function(t) { return t; };
 
-func = $injector(func, {t: 1});
+func = $injector(func, binds);
 console.log(func(null));
