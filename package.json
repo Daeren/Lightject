@@ -1,6 +1,6 @@
 {
     "name": "lightject",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "Lightweight module for Dependency Injection",
 
     "homepage": "http://666.io",
@@ -36,6 +36,6 @@
         "url": "https://github.com/Daeren/Lightject/issues"
     },
 
-    "_id": "lightject@0.0.3",
+    "_id": "lightject@0.0.4",
     "_from": "lightject@"
 }

@@ -19,9 +19,16 @@ var data = {
         "output": console.log
     };
 
+var print;
+
 //-------------]>
 
-var print = $injector(fLog, binds);
+$injector
+    .value("x", 0)
+    .service("y", function() { this.v = 1; })
+    .factory("z", function() { return {"v": 3}; });
+	
+print = $injector(fLog, binds);
 print(data, ctx);
 
 $injector.run(fLog, data, ctx);
