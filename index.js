@@ -2,7 +2,7 @@
 //
 // Author: Daeren Torn
 // Site: 666.io
-// Version: 0.0.4
+// Version: 0.0.5
 //
 //-----------------------------------------------------
 
@@ -64,25 +64,37 @@ var $injector = (function createInstance() {
     //-------------------------------]>
 
     function injector(f, binds) {
-        if(typeof(f) !== "function")
-            return null;
+        var i, arg;
 
-        var strFunc     = f.toString(),
-            strFuncArgs = strFunc.match(/^function\s*[^\(]*\(\s*([^\)]*)\)/m);
-
-        var i, arg,
+        var strFunc, strFuncArgs,
             funcArgs, argsLen, callStack;
 
-        if(strFuncArgs[1]) {
+        if(Array.isArray(f)) {
+            funcArgs = f;
+            f = funcArgs.pop();
+
+            if(typeof(f) !== "function")
+                return null;
+
+            strFunc = f.toString();
+        } else if(typeof(f) === "function") {
+            strFunc = f.toString();
+            strFuncArgs = strFunc.match(/^function\s*[^\(]*\(\s*([^\)]*)\)/m);
+        } else
+            return null;
+
+        if(strFuncArgs && strFuncArgs[1]) {
             strFuncArgs = strFuncArgs[1].replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))|[\s\t\n]+/gm, "");
 
-            if(strFuncArgs) {
+            if(strFuncArgs)
                 funcArgs = strFuncArgs.split(/,/g);
-                argsLen = funcArgs.length;
+        }
 
-                if(argsLen)
-                    callStack = new Array(argsLen);
-            }
+        if(funcArgs) {
+            argsLen = funcArgs.length;
+
+            if(argsLen)
+                callStack = new Array(argsLen);
         }
 
         return caller;

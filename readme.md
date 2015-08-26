@@ -32,6 +32,7 @@ print = $injector(fLog, binds);
 print(data, ctx);
 
 $injector.run(fLog, data, ctx);
+$injector.run(["x", "y", function(d1, d2) { return d2.v + d1; }]);
 
 //-------------]>
 

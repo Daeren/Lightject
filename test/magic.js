@@ -54,3 +54,9 @@ func = function(t) { return t; };
 
 func = $injector(func, binds);
 console.log(func(null));
+
+//------------]>
+
+func = ["x", "y", "z", function(d1, d2, d3) { return "" + d3 + d2 + d1; }];
+
+console.log($injector.run(func, data));
