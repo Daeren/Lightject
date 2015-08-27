@@ -22,7 +22,7 @@ var dfunc   = function dfunc(dx, dy, dz) { return "" + dx + dy.v + dz.v; };
 
 //--------)>
 
-$injector.logger(function(name, data) {
+$injector.onCaller(function logger(name, data) {
     console.log(name, ":", JSON.stringify(data));
 });
 
