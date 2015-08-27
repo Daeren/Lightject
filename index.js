@@ -15,6 +15,10 @@ var $injector = (function createInstance() {
 
     var gValues;
 
+    var reMatchFuncArgs     = /^function\s*[^\(]*\(\s*([^\)]*)\)/m,
+        reFilterFuncArgs    = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))|[\s\t\n]+/gm,
+        reSplitFuncArgs     = /,/g;
+
     //--------------------]>
 
     injector.value = function(key, value) {
@@ -69,6 +73,8 @@ var $injector = (function createInstance() {
         var strFunc, strFuncArgs,
             funcArgs, argsLen, callStack;
 
+        //-----------]>
+
         if(Array.isArray(f)) {
             funcArgs = f;
             f = funcArgs.pop();
@@ -79,15 +85,15 @@ var $injector = (function createInstance() {
             strFunc = f.toString();
         } else if(typeof(f) === "function") {
             strFunc = f.toString();
-            strFuncArgs = strFunc.match(/^function\s*[^\(]*\(\s*([^\)]*)\)/m);
+            strFuncArgs = strFunc.match(reMatchFuncArgs);
         } else
             return null;
 
         if(strFuncArgs && strFuncArgs[1]) {
-            strFuncArgs = strFuncArgs[1].replace(/((\/\/.*$)|(\/\*[\s\S]*?\*\/))|[\s\t\n]+/gm, "");
+            strFuncArgs = strFuncArgs[1].replace(reFilterFuncArgs, "");
 
             if(strFuncArgs)
-                funcArgs = strFuncArgs.split(/,/g);
+                funcArgs = strFuncArgs.split(reSplitFuncArgs);
         }
 
         if(funcArgs) {
@@ -97,7 +103,11 @@ var $injector = (function createInstance() {
                 callStack = new Array(argsLen);
         }
 
+        //-----------]>
+
         return caller;
+
+        //-----------]>
 
         function caller(data, ctx) {
             if(!argsLen || !data && !binds && !gValues)
