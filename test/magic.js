@@ -17,15 +17,19 @@ var ctx     = {t: 9},
     binds   = {t: 100},
     data    = {x: 1, y: 2, z: 3};
 
-var func    = function(x, y, z, t) { return x + y + z + (t || this.t); };
-var dfunc   = function(dx, dy, dz) { return "" + dx + dy.v + dz.v; };
+var func    = function func(x, y, z, t) { return x + y + z + (t || this.t); };
+var dfunc   = function dfunc(dx, dy, dz) { return "" + dx + dy.v + dz.v; };
 
 //--------)>
 
+$injector.logger(function(name, data) {
+    console.log(name, ":", JSON.stringify(data));
+});
+
 $injector
     .value("dx", 0)
-    .service("dy", function() { this.v = 1; })
-    .factory("dz", function() { return {"v": 3}; });
+    .service("dy", function dy() { this.v = 1; })
+    .factory("dz", function dz() { return {"v": 3}; });
 
 //---------------------------]>
 

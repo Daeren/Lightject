@@ -13,11 +13,15 @@ var $injector = (function createInstance() {
 
     //-------------------------------]>
 
-    var gValues;
+    var gValues,
+
+        gLogger;
 
     var reMatchFuncArgs     = /^function\s*[^\(]*\(\s*([^\)]*)\)/m,
         reFilterFuncArgs    = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))|[\s\t\n]+/gm,
-        reSplitFuncArgs     = /,/g;
+        reSplitFuncArgs     = /,/g,
+
+        reFuncName          = /^function\s?([^\s(]*)/;
 
     //--------------------]>
 
@@ -57,6 +61,15 @@ var $injector = (function createInstance() {
         return f ? f(data, ctx) : f;
     };
 
+    injector.logger = function(f) {
+        if(typeof(f) !== "function")
+            throw new Error("logger: arg is not a function!");
+
+        gLogger = f;
+
+        return injector;
+    };
+
     //-------)>
 
     injector.createInstance = createInstance;
@@ -71,7 +84,7 @@ var $injector = (function createInstance() {
         var i, arg;
 
         var strFunc, strFuncArgs,
-            funcArgs, argsLen, callStack;
+            funcName, funcArgs, argsLen, callStack;
 
         //-----------]>
 
@@ -88,6 +101,11 @@ var $injector = (function createInstance() {
             strFuncArgs = strFunc.match(reMatchFuncArgs);
         } else
             return null;
+
+        if(gLogger) {
+            funcName = strFunc.match(reFuncName);
+            funcName = funcName && funcName[1] ? funcName[1] : "[anon]";
+        }
 
         if(strFuncArgs && strFuncArgs[1]) {
             strFuncArgs = strFuncArgs[1].replace(reFilterFuncArgs, "");
@@ -110,6 +128,9 @@ var $injector = (function createInstance() {
         //-----------]>
 
         function caller(data, ctx) {
+            if(gLogger)
+                gLogger(funcName, data);
+
             if(!argsLen || !data && !binds && !gValues)
                 return ctx ? f.apply(ctx) : f();
 
