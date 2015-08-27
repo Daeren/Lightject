@@ -45,7 +45,7 @@ function fLog(input, output, myBind) {
 * Browser: +
 
 
-#### 2.5# of the fundamental modules
+#### 2# of the fundamental modules
 [3# Aigis][2]
 
 ## License

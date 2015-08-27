@@ -2,7 +2,7 @@
 //
 // Author: Daeren Torn
 // Site: 666.io
-// Version: 0.0.5
+// Version: 0.0.6
 //
 //-----------------------------------------------------
 
@@ -101,7 +101,7 @@ var $injector = (function createInstance() {
 
         function caller(data, ctx) {
             if(!argsLen || !data && !binds && !gValues)
-                return f.apply(ctx|| f);
+                return ctx ? f.apply(ctx) : f();
 
             i = argsLen;
 
