@@ -2,7 +2,7 @@
 //
 // Author: Daeren Torn
 // Site: 666.io
-// Version: 0.0.6
+// Version: 0.0.7
 //
 //-----------------------------------------------------
 
@@ -17,11 +17,11 @@ var $injector = (function createInstance() {
 
         gOnCaller;
 
-    var reMatchFuncArgs     = /^function\s*[^\(]*\(\s*([^\)]*)\)/m,
-        reFilterFuncArgs    = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))|[\s\t\n]+/gm,
-        reSplitFuncArgs     = /,/g,
+    var gReMatchFuncArgs     = /^function\s*[^\(]*\(\s*([^\)]*)\)/m,
+        gReFilterFuncArgs    = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))|[\s\t\n]+/gm,
+        gReSplitFuncArgs     = /,/g,
 
-        reFuncName          = /^function\s?([^\s(]*)/;
+        gReFuncName          = /^function\s?([^\s(]*)/;
 
     //--------------------]>
 
@@ -43,6 +43,9 @@ var $injector = (function createInstance() {
     //-------)>
 
     injector.table = function(table, binds) {
+        if(!table || typeof(table) !== "object")
+            return null;
+
         for(var name in table) {
             if(!Object.prototype.hasOwnProperty.call(table, name))
                 continue;
@@ -60,6 +63,44 @@ var $injector = (function createInstance() {
         f = injector(f);
         return f ? f(data, ctx) : f;
     };
+
+    //---)>
+    
+    injector.runTable = function(table, data, ctx) {
+        if(!table || typeof(table) !== "object")
+            return null;
+
+        for(var name in table) {
+            if(!Object.prototype.hasOwnProperty.call(table, name))
+                continue;
+
+            var e = table[name];
+
+            if(typeof(e) === "function")
+                injector.run(e, data, ctx);
+        }
+
+        return table;
+    };
+
+    injector.execTable = function(table, data, ctx) {
+        if(!table || typeof(table) !== "object")
+            return null;
+
+        for(var name in table) {
+            if(!Object.prototype.hasOwnProperty.call(table, name))
+                continue;
+
+            var e = table[name];
+
+            if(typeof(e) === "function")
+                table[name] = injector.run(e, data, ctx);
+        }
+
+        return table;
+    };
+
+    //-------)>
 
     injector.onCaller = function(f) {
         if(typeof(f) !== "function")
@@ -98,21 +139,25 @@ var $injector = (function createInstance() {
             strFunc = f.toString();
         } else if(typeof(f) === "function") {
             strFunc = f.toString();
-            strFuncArgs = strFunc.match(reMatchFuncArgs);
+            strFuncArgs = strFunc.match(gReMatchFuncArgs);
         } else
             return null;
 
+        //-------)>
+
         if(gOnCaller) {
-            funcName = strFunc.match(reFuncName);
+            funcName = strFunc.match(gReFuncName);
             funcName = funcName && funcName[1] ? funcName[1] : "[anon]";
         }
 
         if(strFuncArgs && strFuncArgs[1]) {
-            strFuncArgs = strFuncArgs[1].replace(reFilterFuncArgs, "");
+            strFuncArgs = strFuncArgs[1].replace(gReFilterFuncArgs, "");
 
             if(strFuncArgs)
-                funcArgs = strFuncArgs.split(reSplitFuncArgs);
+                funcArgs = strFuncArgs.split(gReSplitFuncArgs);
         }
+
+        //----)>
 
         if(funcArgs) {
             argsLen = funcArgs.length;

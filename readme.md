@@ -45,6 +45,22 @@ function fLog(input, output, myBind) {
 * Browser: +
 
 
+| Method          | Arguments              | Return 	               |
+|-----------------|------------------------|---------------------------|
+|                 | -                      |                           |
+| createInstance  |    			           | this                      |
+| onCaller	      | callback(name, data)   | this or exception         |
+|                 | -                      |                           |
+| value	          |    			           | this                      |
+| service	      |    			           | this                      |
+| factory	      |    			           | this                      |
+|                 | -                      |                           |
+| table	          | table, binds   		   | table or null             |
+| run	          | f, data, ctx   		   | function or null          |
+| runTable	      | table, data, ctx   	   | table or null             |
+| execTable	      | table, data, ctx   	   | overwritten table or null |
+
+
 #### 2# of the fundamental modules
 [3# Aigis][2]
 
