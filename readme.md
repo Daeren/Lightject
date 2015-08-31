@@ -32,7 +32,7 @@ print = $injector(fLog, binds);
 print(data, ctx);
 
 $injector.run(fLog, data, ctx);
-$injector.run(["x", "y", function(d1, d2) { return d2.v + d1; }]);
+$injector.run(["x", "y", function(d1, d2) { return d1 + d2.v; }]);
 
 //-------------]>
 
@@ -45,20 +45,21 @@ function fLog(input, output, myBind) {
 * Browser: +
 
 
-| Method          | Arguments              | Return 	               |
-|-----------------|------------------------|---------------------------|
-|                 | -                      |                           |
-| createInstance  |    			           | this                      |
-| onCaller	      | callback(name, data)   | this or exception         |
-|                 | -                      |                           |
-| value	          |    			           | this                      |
-| service	      |    			           | this                      |
-| factory	      |    			           | this                      |
-|                 | -                      |                           |
-| table	          | table, binds   		   | table or null             |
-| run	          | f, data, ctx   		   | function or null          |
-| runTable	      | table, data, ctx   	   | table or null             |
-| execTable	      | table, data, ctx   	   | overwritten table or null |
+| Method          | Arguments              | Return 	                      |
+|-----------------|------------------------|----------------------------------|
+|                 | -                      |                                  |
+| createInstance  |    			           | this                             |
+| onCaller	      | callback(name, data)   | this or exception                |
+|                 | -                      |                                  |
+| value	          | key, value   		   | this                             |
+| service	      | name, func   		   | this                             |
+| factory	      | name, func   		   | this                             |
+|                 | -                      |                                  |
+| table	          | table, binds   		   | table or null                    |
+|                 | -                      |                                  |
+| run	          | f, data, ctx   		   | result of a function or null     |
+| runTable	      | table, data, ctx   	   | table or null                    |
+| execTable	      | table, data, ctx   	   | overwritten table or null        |
 
 
 #### 2# of the fundamental modules
