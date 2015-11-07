@@ -1,27 +1,36 @@
 ﻿//-----------------------------------------------------
 //
-// Author: Daeren Torn
+// Author: Daeren
 // Site: 666.io
-// Version: 0.0.7
 //
 //-----------------------------------------------------
 
+"use strict";
+
 //-----------------------------------------------------
 
-var $injector = (function createInstance() {
-    "use strict";
+const rFs           = require("fs"),
+      rPath         = require("path");
 
-    //-------------------------------]>
+const rEval         = require("./eval");
 
-    var gValues,
+//-----------------------------------------------------
 
-        gOnCaller;
+const gReMatchFuncArgs     = /^function\s*[^\(]*\(\s*([^\)]*)\)/m,
+      gReFilterFuncArgs    = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))|[\s\t\n]+/gm,
+      gReSplitFuncArgs     = /,/g,
 
-    var gReMatchFuncArgs     = /^function\s*[^\(]*\(\s*([^\)]*)\)/m,
-        gReFilterFuncArgs    = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))|[\s\t\n]+/gm,
-        gReSplitFuncArgs     = /,/g,
+      gReFuncName          = /^function\s?([^\s(]*)/;
 
-        gReFuncName          = /^function\s?([^\s(]*)/;
+//-----------------------------------------------------
+
+module.exports = global.$injector = createInstance();
+
+//-----------------------------------------------------
+
+function createInstance() {
+    let injValues,
+        injOnCaller;
 
     //--------------------]>
 
@@ -30,8 +39,8 @@ var $injector = (function createInstance() {
         return injector;
     };
 
-    injector.service = function(name, func) {
-        setValue(name, new func());
+    injector.service = function(name, CFunc) {
+        setValue(name, new CFunc());
         return injector;
     };
 
@@ -46,11 +55,11 @@ var $injector = (function createInstance() {
         if(!table || typeof(table) !== "object")
             return null;
 
-        for(var name in table) {
-            if(!Object.prototype.hasOwnProperty.call(table, name))
+        for(let name in table) {
+            if(!hasOwnProperty(table, name))
                 continue;
 
-            var e = table[name];
+            let e = table[name];
 
             if(typeof(e) === "function")
                 table[name] = injector(e, binds);
@@ -65,16 +74,16 @@ var $injector = (function createInstance() {
     };
 
     //---)>
-    
+
     injector.runTable = function(table, data, ctx) {
         if(!table || typeof(table) !== "object")
             return null;
 
-        for(var name in table) {
-            if(!Object.prototype.hasOwnProperty.call(table, name))
+        for(let name in table) {
+            if(!hasOwnProperty(table, name))
                 continue;
 
-            var e = table[name];
+            let e = table[name];
 
             if(typeof(e) === "function")
                 injector.run(e, data, ctx);
@@ -87,11 +96,11 @@ var $injector = (function createInstance() {
         if(!table || typeof(table) !== "object")
             return null;
 
-        for(var name in table) {
-            if(!Object.prototype.hasOwnProperty.call(table, name))
+        for(let name in table) {
+            if(!hasOwnProperty(table, name))
                 continue;
 
-            var e = table[name];
+            let e = table[name];
 
             if(typeof(e) === "function")
                 table[name] = injector.run(e, data, ctx);
@@ -102,11 +111,36 @@ var $injector = (function createInstance() {
 
     //-------)>
 
+    injector.include = function(file, data) {
+        let code, srcFile, globalVars;
+
+        srcFile = (Buffer.isBuffer(file) ? file : rFs.readFileSync(rPath.normalize(file))).toString();
+        globalVars = Object.keys(data).join();
+
+        code = "(function(" + globalVars + ") {";
+        code += "\r\n";
+        code += "var module = {'exports': {}};";
+        code += "\r\n";
+        code += "(function(module, exports) {";
+        code += "\r\n";
+        code += srcFile;
+        code += "\r\n";
+        code += "})(module, module.exports);";
+        code += "\r\n";
+        code += "return module.exports;";
+        code += "\r\n";
+        code += "});";
+
+        return injector(rEval(code))(data);
+    };
+
+    //-------)>
+
     injector.onCaller = function(f) {
         if(typeof(f) !== "function")
             throw new Error("onCaller: arg is not a function!");
 
-        gOnCaller = f;
+        injOnCaller = f;
 
         return injector;
     };
@@ -121,34 +155,36 @@ var $injector = (function createInstance() {
 
     //-------------------------------]>
 
-    function injector(f, binds) {
-        var i, arg;
+    function injector(srcFunc, binds) {
+        let i, arg;
 
-        var strFunc, strFuncArgs,
+        let strFunc, strFuncArgs,
             funcName, funcArgs, argsLen, callStack;
 
         //-----------]>
 
-        if(Array.isArray(f)) {
-            funcArgs = f;
-            f = funcArgs.pop();
+        if(Array.isArray(srcFunc)) {
+            funcArgs = srcFunc;
+            srcFunc = funcArgs.pop();
 
-            if(typeof(f) !== "function")
+            if(typeof(srcFunc) !== "function")
                 return null;
 
-            strFunc = f.toString();
-        } else if(typeof(f) === "function") {
-            strFunc = f.toString();
+            strFunc = srcFunc.toString();
+        } else if(typeof(srcFunc) === "function") {
+            strFunc = srcFunc.toString();
             strFuncArgs = strFunc.match(gReMatchFuncArgs);
         } else
             return null;
 
         //-------)>
 
-        if(gOnCaller) {
+        if(injOnCaller) {
             funcName = strFunc.match(gReFuncName);
             funcName = funcName && funcName[1] ? funcName[1] : "[anon]";
         }
+
+        //--)>
 
         if(strFuncArgs && strFuncArgs[1]) {
             strFuncArgs = strFuncArgs[1].replace(gReFilterFuncArgs, "");
@@ -173,31 +209,35 @@ var $injector = (function createInstance() {
         //-----------]>
 
         function caller(data, ctx) {
-            if(gOnCaller)
-                gOnCaller(funcName, data, ctx);
+            if(injOnCaller)
+                injOnCaller(funcName, data, ctx);
 
-            if(!argsLen || !data && !binds && !gValues)
-                return ctx ? f.apply(ctx) : f();
+            if(!argsLen || !data && !binds && !injValues)
+                return ctx ? srcFunc.apply(ctx) : srcFunc();
 
             i = argsLen;
 
             while(i--) {
                 arg = funcArgs[i];
-                callStack[i] = data && data[arg] || binds && binds[arg] || gValues && gValues[arg];
+
+                callStack[i] = hasOwnProperty(data, arg) ? data[arg] :
+                    (hasOwnProperty(binds, arg) ? binds[arg] : hasOwnProperty(injValues, arg) && injValues[arg]);
             }
 
-            return f.apply(ctx || f, callStack);
+            return srcFunc.apply(ctx || srcFunc, callStack);
         }
     }
 
+    //--------[HELPERS]--------}>
+
     function setValue(key, value) {
-        gValues = gValues || {};
-        gValues[key] = value;
+        injValues = injValues || {};
+        injValues[key] = value;
     }
-})();
+}
 
-//-----------------------------------------------------
+//-------------[HELPERS]--------------}>
 
-if(typeof(module) == "object") {
-    module.exports = global.$injector = $injector;
+function hasOwnProperty(obj, prop) {
+    return obj && typeof(obj) === "object" && Object.prototype.hasOwnProperty.call(obj, prop);
 }

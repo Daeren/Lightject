@@ -4,22 +4,22 @@
 ```js
 require("lightject")
 
-var ctx = {
+let ctx = {
         "payload": "!"
     };
 
-var binds = {
+let binds = {
         "myBind": "?"
     };
 
-var data = {
+let data = {
         "myBind": "Replace!",
 
         "input":  "Simple start",
         "output": console.log
     };
 
-var print;
+let print;
 
 //-------------]>
 
@@ -27,7 +27,7 @@ $injector
     .value("x", 0)
     .service("y", function() { this.v = 1; })
     .factory("z", function() { return {"v": 3}; });
-	
+    
 print = $injector(fLog, binds);
 print(data, ctx);
 
@@ -42,24 +42,23 @@ function fLog(input, output, myBind) {
 ```
 
 * Benchmark: +
-* Browser: +
 
 
-| Method          | Arguments              | Return 	                      |
-|-----------------|------------------------|----------------------------------|
-|                 | -                      |                                  |
-| createInstance  |    			           | this                             |
-| onCaller	      | callback(name, data)   | this or exception                |
-|                 | -                      |                                  |
-| value	          | key, value   		   | this                             |
-| service	      | name, func   		   | this                             |
-| factory	      | name, func   		   | this                             |
-|                 | -                      |                                  |
-| table	          | table, binds   		   | table or null                    |
-|                 | -                      |                                  |
-| run	          | f, data, ctx   		   | result of a function or null     |
-| runTable	      | table, data, ctx   	   | table or null                    |
-| execTable	      | table, data, ctx   	   | overwritten table or null        |
+| Method          | Arguments               | Return                           |
+|-----------------|-------------------------|----------------------------------|
+|                 | -                       |                                  |
+| createInstance  |                         | this                             |
+| onCaller        | callback(name, data)    | this or exception                |
+|                 | -                       |                                  |
+| value           | key, value              | this                             |
+| service         | name, func              | this                             |
+| factory         | name, func              | this                             |
+|                 | -                       |                                  |
+| table           | table[, binds]          | table or null                    |
+|                 | -                       |                                  |
+| run             | f, data[, ctx]          | result of a function or null     |
+| runTable        | table, data[, ctx]      | table or null                    |
+| execTable       | table, data[, ctx]      | overwritten table or null        |
 
 
 #### 2# of the fundamental modules

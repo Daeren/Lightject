@@ -1,6 +1,6 @@
 {
     "name": "lightject",
-    "version": "0.0.7",
+    "version": "0.0.8",
     "description": "Lightweight module for Dependency Injection",
 
     "homepage": "http://666.io",
@@ -26,7 +26,7 @@
 
     "license": "MIT",
     "engines": {
-        "node": ">= 0.8.0"
+        "node": ">= 0.12.0"
     },
 
     "readme": "",
@@ -34,8 +34,5 @@
 
     "bugs": {
         "url": "https://github.com/Daeren/Lightject/issues"
-    },
-
-    "_id": "lightject@0.0.7",
-    "_from": "lightject@"
+    }
 }

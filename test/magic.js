@@ -13,9 +13,19 @@ require("./../index");
 
 //-----------------------------------------------------
 
+let result = $injector.include("./isomod.js", {"x": 1, "y": 2, "z": 3});
+
+console.log(result);
+
+
+
+
+
+return;
+
 var ctx     = {t: 9},
     binds   = {t: 100},
-    data    = {x: 1, y: 2, z: 3};
+    data    = {x: 0, y: 2, z: 3};
 
 var func    = function func(x, y, z, t) { return x + y + z + (t || this.t); };
 var dfunc   = function dfunc(dx, dy, dz) { return "" + dx + dy.v + dz.v; };
@@ -64,3 +74,19 @@ console.log(func(null));
 func = ["x", "y", "z", function(d1, d2, d3) { return "" + d3 + d2 + d1; }];
 
 console.log($injector.run(func, data));
+
+//---)>
+
+func = ["x", "y", "z", (d1, d2, d3) => ("" + d3 + d2 + d1)];
+
+console.log($injector.run(func, data));
+
+//------------]>
+
+func = () => this.t;
+func.t = 9;
+
+func = $injector(func);
+console.log(func(data, ctx));
+
+//------------]>
