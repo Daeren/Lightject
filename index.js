@@ -112,14 +112,45 @@ function createInstance() {
     //-------)>
 
     injector.include = function(file, data) {
-        let code, srcFile, globalVars;
+        const mdlPaths = [];
 
-        srcFile = (Buffer.isBuffer(file) ? file : rFs.readFileSync(rPath.normalize(file))).toString();
+        let code, srcFile, fileName, dirName, globalVars;
+
+        if(!Buffer.isBuffer(file)) {
+            fileName = rPath.normalize(file);
+            dirName = rPath.join(fileName, "..");
+
+            srcFile = rFs.readFileSync(fileName)
+        }
+
+        srcFile = srcFile.toString();
         globalVars = Object.keys(data).join();
+
+        let curPath, lastPath;
+
+        do {
+            lastPath = curPath;
+            curPath = rPath.join(curPath || fileName, "..");
+
+            if(lastPath === curPath)
+                break;
+
+            mdlPaths.push(rPath.normalize(curPath + "/node_modules"));
+        } while(1);
+
+        //-------------]>
+
+        const ctxEval = {
+            "filename": fileName,
+            "dirname":  dirName,
+            "paths":    mdlPaths
+        };
+
+        //-------------]>
 
         code = "(function(" + globalVars + ") {";
         code += "\r\n";
-        code += "var module = {'exports': {}};";
+        code += "var module = {'exports': {}, 'filename': '" + fileName + "', 'dirname': '" + dirName + "', 'paths': " + JSON.stringify(mdlPaths) + "};";
         code += "\r\n";
         code += "(function(module, exports) {";
         code += "\r\n";
@@ -131,7 +162,7 @@ function createInstance() {
         code += "\r\n";
         code += "});";
 
-        return injector(rEval(code))(data);
+        return injector(rEval(ctxEval, code))(data);
     };
 
     //-------)>
