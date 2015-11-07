@@ -142,8 +142,7 @@ function createInstance() {
 
         const ctxEval = {
             "filename": fileName,
-            "dirname":  dirName,
-            "paths":    mdlPaths
+            "dirname":  dirName
         };
 
         //-------------]>

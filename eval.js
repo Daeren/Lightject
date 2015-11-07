@@ -14,8 +14,8 @@ module.exports = function() {
         if(arguments[0].hasOwnProperty(i))
             module[i] = arguments[0][i];
 
-    __filename = module.filename;
-    __dirname = module.dirname;
+    var __filename = module.filename;
+    var __dirname = module.dirname;
 
     return eval(arguments[1]);
 };
