@@ -124,7 +124,7 @@ function createInstance() {
 
         globalVars = Object.keys(data).join();
 
-        do {
+        while(1) {
             lastPath = curPath;
             curPath = rPath.join(curPath || fileName, "..");
 
@@ -132,7 +132,7 @@ function createInstance() {
                 break;
 
             mdlPaths.push(rPath.normalize(curPath + "/node_modules"));
-        } while(1);
+        }
 
         //-------------]>
 
