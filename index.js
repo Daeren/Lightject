@@ -115,18 +115,14 @@ function createInstance() {
         const mdlPaths = [];
 
         let code, srcFile, fileName, dirName, globalVars;
-
-        if(!Buffer.isBuffer(file)) {
-            fileName = rPath.normalize(file);
-            dirName = rPath.join(fileName, "..");
-
-            srcFile = rFs.readFileSync(fileName)
-        }
-
-        srcFile = srcFile.toString();
-        globalVars = Object.keys(data).join();
-
         let curPath, lastPath;
+
+        fileName = rPath.normalize(file);
+        dirName = rPath.join(fileName, "..");
+
+        srcFile = rFs.readFileSync(fileName).toString();
+
+        globalVars = Object.keys(data).join();
 
         do {
             lastPath = curPath;
