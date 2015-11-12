@@ -112,17 +112,16 @@ function createInstance() {
     //-------)>
 
     injector.include = function(file, data) {
+        const pathPostfix = ["/index.js", ".js"];
         const mdlPaths = [];
 
         let code, srcFile, fileName, dirName, globalVars;
         let curPath, lastPath;
 
         fileName = rPath.normalize(file);
-        dirName = rPath.join(fileName, "..");
+        srcFile = readFile(fileName);
 
-        srcFile = rFs.readFileSync(fileName).toString();
-
-        globalVars = Object.keys(data).join();
+        globalVars = (data && typeof(data) === "object") ? Object.keys(data).join() : "";
 
         while(1) {
             lastPath = curPath;
@@ -157,7 +156,24 @@ function createInstance() {
         code += "\r\n";
         code += "});";
 
+        //-------------]>
+
         return injector(rEval(ctxEval, code))(data);
+
+        //-------------]>
+
+        function readFile(file) {
+            try {
+                dirName = rPath.join(file, "..");
+
+                return rFs.readFileSync(file).toString();
+            } catch(e) {
+                if(e.code !== "ENOENT" || !pathPostfix.length)
+                    throw e;
+
+                readFile(fileName + pathPostfix.pop());
+            }
+        }
     };
 
     //-------)>
