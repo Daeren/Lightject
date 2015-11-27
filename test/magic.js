@@ -13,16 +13,6 @@ require("./../index");
 
 //-----------------------------------------------------
 
-let result = $injector.include("./isomod.js", {"x": 1, "y": 2, "z": 3});
-
-console.log(result);
-
-
-
-
-
-return;
-
 var ctx     = {t: 9},
     binds   = {t: 100},
     data    = {x: 0, y: 2, z: 3};

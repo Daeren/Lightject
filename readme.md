@@ -42,6 +42,7 @@ function fLog(input, output, myBind) {
 ```
 
 * Benchmark: +
+* Browser: +
 
 
 | Method          | Arguments               | Return                           |

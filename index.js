@@ -5,281 +5,229 @@
 //
 //-----------------------------------------------------
 
-"use strict";
+(function() {
+    "use strict";
 
-//-----------------------------------------------------
+    //-----------------------------------------------------
 
-const rFs           = require("fs"),
-      rPath         = require("path");
+    var gReMatchFuncArgs     = /^function\s*[^\(]*\(\s*([^\)]*)\)/m,
+        gReFilterFuncArgs    = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))|[\s\t\n]+/gm,
+        gReSplitFuncArgs     = /,/g,
 
-const rEval         = require("./eval");
+        gReFuncName          = /^function\s?([^\s(]*)/;
 
-//-----------------------------------------------------
+    //-----------------------------------------------------
 
-const gReMatchFuncArgs     = /^function\s*[^\(]*\(\s*([^\)]*)\)/m,
-      gReFilterFuncArgs    = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))|[\s\t\n]+/gm,
-      gReSplitFuncArgs     = /,/g,
+    module.exports = global.$injector = createInstance();
 
-      gReFuncName          = /^function\s?([^\s(]*)/;
+    //-----------------------------------------------------
 
-//-----------------------------------------------------
+    function createInstance() {
+        var injValues, injOnCaller;
 
-module.exports = global.$injector = createInstance();
+        //--------------------]>
 
-//-----------------------------------------------------
+        function injector(srcFunc, binds) {
+            var i, arg;
 
-function createInstance() {
-    let injValues,
-        injOnCaller;
+            var strFunc, strFuncArgs,
+                funcName, funcArgs, argsLen, callStack;
 
-    //--------------------]>
+            //-----------]>
 
-    injector.value = function(key, value) {
-        setValue(key, value);
-        return injector;
-    };
+            if(Array.isArray(srcFunc)) {
+                funcArgs = srcFunc;
+                srcFunc = funcArgs.pop();
 
-    injector.service = function(name, CFunc) {
-        setValue(name, new CFunc());
-        return injector;
-    };
+                if(typeof(srcFunc) !== "function") {
+                    return null;
+                }
 
-    injector.factory = function(name, func) {
-        setValue(name, injector.run(func));
-        return injector;
-    };
+                strFunc = srcFunc.toString();
+            }
+            else if(typeof(srcFunc) === "function") {
+                strFunc = srcFunc.toString();
+                strFuncArgs = strFunc.match(gReMatchFuncArgs);
+            }
+            else {
+                return null;
+            }
 
-    //-------)>
+            //-------)>
 
-    injector.table = function(table, binds) {
-        if(!table || typeof(table) !== "object")
-            return null;
+            if(injOnCaller) {
+                funcName = strFunc.match(gReFuncName);
+                funcName = funcName && funcName[1] ? funcName[1] : "[anon]";
+            }
 
-        for(let name in table) {
-            if(!hasOwnProperty(table, name))
-                continue;
+            //--)>
 
-            let e = table[name];
+            if(strFuncArgs && strFuncArgs[1]) {
+                strFuncArgs = strFuncArgs[1].replace(gReFilterFuncArgs, "");
 
-            if(typeof(e) === "function")
-                table[name] = injector(e, binds);
-        }
+                if(strFuncArgs) {
+                    funcArgs = strFuncArgs.split(gReSplitFuncArgs);
+                }
+            }
 
-        return table;
-    };
+            //----)>
 
-    injector.run = function(f, data, ctx) {
-        f = injector(f);
-        return f ? f(data, ctx) : f;
-    };
+            if(funcArgs) {
+                argsLen = funcArgs.length;
 
-    //---)>
+                if(argsLen) {
+                    callStack = new Array(argsLen);
+                }
+            }
 
-    injector.runTable = function(table, data, ctx) {
-        if(!table || typeof(table) !== "object")
-            return null;
+            //-----------]>
 
-        for(let name in table) {
-            if(!hasOwnProperty(table, name))
-                continue;
+            return caller;
 
-            let e = table[name];
+            //-----------]>
 
-            if(typeof(e) === "function")
-                injector.run(e, data, ctx);
-        }
+            function caller(data, ctx) {
+                if(!data || typeof(data) !== "object") {
+                    return;
+                }
 
-        return table;
-    };
+                if(injOnCaller) {
+                    injOnCaller(funcName, data, ctx);
+                }
 
-    injector.execTable = function(table, data, ctx) {
-        if(!table || typeof(table) !== "object")
-            return null;
+                if(!argsLen || !data && !binds && !injValues) {
+                    return ctx ? srcFunc.apply(ctx) : srcFunc();
+                }
 
-        for(let name in table) {
-            if(!hasOwnProperty(table, name))
-                continue;
+                i = argsLen;
 
-            let e = table[name];
+                while(i--) {
+                    arg = funcArgs[i];
+                    callStack[i] = hasOwnProperty(data, arg) ? data[arg]
+                        : (binds && hasOwnProperty(binds, arg) ? binds[arg]
+                        : injValues && hasOwnProperty(injValues, arg) && injValues[arg]);
+                }
 
-            if(typeof(e) === "function")
-                table[name] = injector.run(e, data, ctx);
-        }
-
-        return table;
-    };
-
-    //-------)>
-
-    injector.include = function(file, data) {
-        const pathPostfix = ["/index.js", ".js"];
-        const mdlPaths = [];
-
-        let code, srcFile, fileName, dirName, globalVars;
-        let curPath, lastPath;
-
-        fileName = rPath.normalize(file);
-        srcFile = readFile(fileName);
-
-        globalVars = (data && typeof(data) === "object") ? Object.keys(data).join() : "";
-
-        while(1) {
-            lastPath = curPath;
-            curPath = rPath.join(curPath || fileName, "..");
-
-            if(lastPath === curPath)
-                break;
-
-            mdlPaths.push(rPath.normalize(curPath + "/node_modules"));
-        }
-
-        //-------------]>
-
-        const ctxEval = {
-            "filename": fileName,
-            "dirname":  dirName
-        };
-
-        //-------------]>
-
-        code = "(function(" + globalVars + ") {";
-        code += "\r\n";
-        code += "var module = {'exports': {}, 'filename': '" + fileName + "', 'dirname': '" + dirName + "', 'paths': " + JSON.stringify(mdlPaths) + "};";
-        code += "\r\n";
-        code += "(function(module, exports) {";
-        code += "\r\n";
-        code += srcFile;
-        code += "\r\n";
-        code += "})(module, module.exports);";
-        code += "\r\n";
-        code += "return module.exports;";
-        code += "\r\n";
-        code += "});";
-
-        //-------------]>
-
-        return injector(rEval(ctxEval, code))(data);
-
-        //-------------]>
-
-        function readFile(file) {
-            try {
-                dirName = rPath.join(file, "..");
-
-                return rFs.readFileSync(file).toString();
-            } catch(e) {
-                if(e.code !== "ENOENT" || !pathPostfix.length)
-                    throw e;
-
-                readFile(fileName + pathPostfix.pop());
+                return srcFunc.apply(ctx || srcFunc, callStack);
             }
         }
-    };
 
-    //-------)>
+        //--------------------]>
 
-    injector.onCaller = function(f) {
-        if(typeof(f) !== "function")
-            throw new Error("onCaller: arg is not a function!");
+        injector.value = function(key, value) {
+            setValue(key, value);
+            return injector;
+        };
 
-        injOnCaller = f;
+        injector.service = function(name, CFunc) {
+            setValue(name, new CFunc());
+            return injector;
+        };
 
-        return injector;
-    };
-
-    //-------)>
-
-    injector.createInstance = createInstance;
-
-    //-------------------------------]>
-
-    return injector;
-
-    //-------------------------------]>
-
-    function injector(srcFunc, binds) {
-        let i, arg;
-
-        let strFunc, strFuncArgs,
-            funcName, funcArgs, argsLen, callStack;
-
-        //-----------]>
-
-        if(Array.isArray(srcFunc)) {
-            funcArgs = srcFunc;
-            srcFunc = funcArgs.pop();
-
-            if(typeof(srcFunc) !== "function")
-                return null;
-
-            strFunc = srcFunc.toString();
-        } else if(typeof(srcFunc) === "function") {
-            strFunc = srcFunc.toString();
-            strFuncArgs = strFunc.match(gReMatchFuncArgs);
-        } else
-            return null;
+        injector.factory = function(name, func) {
+            setValue(name, injector.run(func));
+            return injector;
+        };
 
         //-------)>
 
-        if(injOnCaller) {
-            funcName = strFunc.match(gReFuncName);
-            funcName = funcName && funcName[1] ? funcName[1] : "[anon]";
-        }
-
-        //--)>
-
-        if(strFuncArgs && strFuncArgs[1]) {
-            strFuncArgs = strFuncArgs[1].replace(gReFilterFuncArgs, "");
-
-            if(strFuncArgs)
-                funcArgs = strFuncArgs.split(gReSplitFuncArgs);
-        }
-
-        //----)>
-
-        if(funcArgs) {
-            argsLen = funcArgs.length;
-
-            if(argsLen)
-                callStack = new Array(argsLen);
-        }
-
-        //-----------]>
-
-        return caller;
-
-        //-----------]>
-
-        function caller(data, ctx) {
-            if(injOnCaller)
-                injOnCaller(funcName, data, ctx);
-
-            if(!argsLen || !data && !binds && !injValues)
-                return ctx ? srcFunc.apply(ctx) : srcFunc();
-
-            i = argsLen;
-
-            while(i--) {
-                arg = funcArgs[i];
-
-                callStack[i] = hasOwnProperty(data, arg) ? data[arg] :
-                    (hasOwnProperty(binds, arg) ? binds[arg] : hasOwnProperty(injValues, arg) && injValues[arg]);
+        injector.table = function(table, binds) {
+            if(!table || typeof(table) !== "object") {
+                return null;
             }
 
-            return srcFunc.apply(ctx || srcFunc, callStack);
+            for(var name in table) {
+                if(!hasOwnProperty(table, name)) {
+                    continue;
+                }
+
+                var e = table[name];
+
+                if(typeof(e) === "function")
+                    table[name] = injector(e, binds);
+            }
+
+            return table;
+        };
+
+        injector.run = function(f, data, ctx) {
+            f = injector(f);
+            return f ? f(data, ctx) : f;
+        };
+
+        //---)>
+
+        injector.runTable = function(table, data, ctx) {
+            if(!table || typeof(table) !== "object") {
+                return null;
+            }
+
+            for(var name in table) {
+                if(!hasOwnProperty(table, name)) {
+                    continue;
+                }
+
+                var e = table[name];
+
+                if(typeof(e) === "function") {
+                    injector.run(e, data, ctx);
+                }
+            }
+
+            return table;
+        };
+
+        injector.execTable = function(table, data, ctx) {
+            if(!table || typeof(table) !== "object") {
+                return null;
+            }
+
+            for(var name in table) {
+                if(!hasOwnProperty(table, name)) {
+                    continue;
+                }
+
+                var e = table[name];
+
+                if(typeof(e) === "function") {
+                    table[name] = injector.run(e, data, ctx);
+                }
+            }
+
+            return table;
+        };
+
+        //-------)>
+
+        injector.onCaller = function(f) {
+            if(typeof(f) !== "function") {
+                throw new Error("onCaller: is not a function");
+            }
+
+            injOnCaller = f;
+
+            return injector;
+        };
+
+        //-------)>
+
+        injector.createInstance = createInstance;
+
+        //-------------------------------]>
+
+        return injector;
+
+        //--------[HELPERS]--------}>
+
+        function setValue(key, value) {
+            injValues = injValues || {};
+            injValues[key] = value;
         }
     }
 
-    //--------[HELPERS]--------}>
+    //-------------[HELPERS]--------------}>
 
-    function setValue(key, value) {
-        injValues = injValues || {};
-        injValues[key] = value;
+    function hasOwnProperty(obj, prop) {
+        return Object.prototype.hasOwnProperty.call(obj, prop);
     }
-}
-
-//-------------[HELPERS]--------------}>
-
-function hasOwnProperty(obj, prop) {
-    return obj && typeof(obj) === "object" && Object.prototype.hasOwnProperty.call(obj, prop);
-}
+})();
