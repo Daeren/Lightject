@@ -103,9 +103,9 @@
 
                 while(i--) {
                     arg = funcArgs[i];
-                    callStack[i] = hasOwnProperty(data, arg) ? data[arg]
-                        : (binds && hasOwnProperty(binds, arg) ? binds[arg]
-                        : injValues && hasOwnProperty(injValues, arg) && injValues[arg]);
+                    callStack[i] = hasOwnProperty.call(data, arg) ? data[arg]
+                        : (binds && hasOwnProperty.call(binds, arg) ? binds[arg]
+                        : injValues && hasOwnProperty.call(injValues, arg) && injValues[arg]);
                 }
 
                 return srcFunc.apply(ctx || srcFunc, callStack);
@@ -137,14 +137,15 @@
             }
 
             for(var name in table) {
-                if(!hasOwnProperty(table, name)) {
+                if(!hasOwnProperty.call(table, name)) {
                     continue;
                 }
 
                 var e = table[name];
 
-                if(typeof(e) === "function")
+                if(typeof(e) === "function") {
                     table[name] = injector(e, binds);
+                }
             }
 
             return table;
@@ -163,7 +164,7 @@
             }
 
             for(var name in table) {
-                if(!hasOwnProperty(table, name)) {
+                if(!hasOwnProperty.call(table, name)) {
                     continue;
                 }
 
@@ -183,7 +184,7 @@
             }
 
             for(var name in table) {
-                if(!hasOwnProperty(table, name)) {
+                if(!hasOwnProperty.call(table, name)) {
                     continue;
                 }
 
@@ -223,11 +224,5 @@
             injValues = injValues || {};
             injValues[key] = value;
         }
-    }
-
-    //-------------[HELPERS]--------------}>
-
-    function hasOwnProperty(obj, prop) {
-        return Object.prototype.hasOwnProperty.call(obj, prop);
     }
 })();
