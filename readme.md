@@ -79,4 +79,4 @@ MIT
 [2]: https://www.npmjs.com/package/aigis
 
 [cod_b]: https://img.shields.io/codacy/88b55f71c45a47838d24ed1e5fd2476c.svg
-[cod_l]: https://www.codacy.com/app/daeren/telegram-bot-api-c/dashboard
+[cod_l]: https://www.codacy.com/app/daeren/Lightject/dashboard
