@@ -99,7 +99,7 @@
 
                 while(i--) {
                     arg = funcArgs[i];
-                    callStack[i] = hasOwnProperty.call(data, arg) ? data[arg]
+                    callStack[i] = data && hasOwnProperty.call(data, arg) ? data[arg]
                         : (binds && hasOwnProperty.call(binds, arg) ? binds[arg]
                         : injValues && hasOwnProperty.call(injValues, arg) && injValues[arg]);
                 }
