@@ -87,10 +87,6 @@
             //-----------]>
 
             function caller(data, ctx) {
-                if(!data || typeof(data) !== "object") {
-                    return;
-                }
-
                 if(injOnCaller) {
                     injOnCaller(funcName, data, ctx);
                 }
