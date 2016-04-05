@@ -51,21 +51,22 @@ function fLog(input, output, myBind) {
 
 #### Module
 
-| Method          | Arguments               | Return                           |
-|-----------------|-------------------------|----------------------------------|
-|                 | -                       |                                  |
-| createInstance  |                         | this                             |
-| onCaller        | callback(name, data)    | this or exception                |
-|                 | -                       |                                  |
-| value           | name, value             | this                             |
-| service         | name, func              | this                             |
-| factory         | name, func              | this                             |
-|                 | -                       |                                  |
-| table           | table[, binds]          | table or null                    |
-|                 | -                       |                                  |
-| run             | f, data[, ctx]          | result of a function or null     |
-| runTable        | table, data[, ctx]      | table or null                    |
-| execTable       | table, data[, ctx]      | overwritten table or null        |
+| Method          | Arguments                   | Return                           |
+|-----------------|-----------------------------|----------------------------------|
+|                 | -                           |                                  |
+| createInstance  |                             | this                             |
+|                 | -                           |                                  |
+| onCaller        | callback(name, data, ctx)   | this or exception                |
+|                 | -                           |                                  |
+| value           | name, value                 | this                             |
+| service         | name, func                  | this                             |
+| factory         | name, func                  | this                             |
+|                 | -                           |                                  |
+| table           | table[, binds]              | table or null                    |
+|                 | -                           |                                  |
+| run             | f, data[, ctx]              | result of a function or null     |
+| runTable        | table, data[, ctx]          | table or null                    |
+| execTable       | table, data[, ctx]          | overwritten table or null        |
 
 
 #### System variables
