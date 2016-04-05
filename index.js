@@ -12,18 +12,29 @@
 
     var gReMatchFuncArgs     = /^function\s*[^\(]*\(\s*([^\)]*)\)/m,
         gReFilterFuncArgs    = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))|[\s\t\n]+/gm,
-        gReSplitFuncArgs     = /,/g,
+        gReSplitFuncArgs     = /,/,
 
         gReFuncName          = /^function\s?([^\s(]*)/;
 
     //-----------------------------------------------------
 
-    module.exports = global.$injector = createInstance();
+    (function(main) {
+        if(!module || typeof(module) !== "object") {
+            $injector = main;
+        }
+        else {
+            if(global && typeof(global) === "object") {
+                global.$injector = main;
+            }
+
+            module.exports = main;
+        }
+    })(createInstance());
 
     //-----------------------------------------------------
 
     function createInstance() {
-        var injValues, injOnCaller;
+        var injVariables, injOnCaller;
 
         //--------------------]>
 
@@ -91,7 +102,7 @@
                     injOnCaller(funcName, data, ctx);
                 }
 
-                if(!argsLen || !data && !binds && !injValues) {
+                if(!argsLen || !data && !binds && !injVariables) {
                     return ctx ? srcFunc.apply(ctx) : srcFunc();
                 }
 
@@ -99,9 +110,12 @@
 
                 while(i--) {
                     arg = funcArgs[i];
-                    callStack[i] = data && hasOwnProperty.call(data, arg) ? data[arg]
-                        : (binds && hasOwnProperty.call(binds, arg) ? binds[arg]
-                        : injValues && hasOwnProperty.call(injValues, arg) && injValues[arg]);
+
+                    callStack[i] = data && hasOwnProperty.call(data, arg) ? data[arg] :
+                        (
+                            binds && hasOwnProperty.call(binds, arg) ? binds[arg] :
+                            injVariables && hasOwnProperty.call(injVariables, arg) && injVariables[arg]
+                        );
                 }
 
                 return srcFunc.apply(ctx || srcFunc, callStack);
@@ -110,24 +124,41 @@
 
         //--------------------]>
 
-        injector.value = function(key, value) {
-            setValue(key, value);
-            return injector;
-        };
+        injector.value          = mthInjValue;
+        injector.service        = mthInjService;
+        injector.factory        = mthInjFactory;
 
-        injector.service = function(name, CFunc) {
-            setValue(name, new CFunc());
-            return injector;
-        };
+        injector.table          = mthInjTable;
+        injector.run            = mthInjRun;
 
-        injector.factory = function(name, func) {
-            setValue(name, injector.run(func));
-            return injector;
-        };
+        injector.runTable       = mthInjRunTable;
+        injector.execTable      = mthInjExecTable;
 
-        //-------)>
+        injector.onCaller       = mthOnCaller;
 
-        injector.table = function(table, binds) {
+        injector.createInstance = createInstance;
+
+        //-------------------------------]>
+
+        return injector;
+
+        //--------[INJ: Methods]--------}>
+
+        function mthInjValue(name, value) {
+            return value === null ? delVariable(name) : setVariable(name, value);
+        }
+
+        function mthInjService(name, CFunc) {
+            return CFunc === null ? delVariable(name) : setVariable(name, new CFunc());
+        }
+
+        function mthInjFactory(name, func) {
+            return func === null ? delVariable(name) : setVariable(name, injector.run(func));
+        }
+
+        //---)>
+
+        function mthInjTable(table, binds) {
             if(!table || typeof(table) !== "object") {
                 return null;
             }
@@ -145,16 +176,16 @@
             }
 
             return table;
-        };
+        }
 
-        injector.run = function(f, data, ctx) {
+        function mthInjRun(f, data, ctx) {
             f = injector(f);
             return f ? f(data, ctx) : f;
-        };
+        }
 
         //---)>
 
-        injector.runTable = function(table, data, ctx) {
+        function mthInjRunTable(table, data, ctx) {
             if(!table || typeof(table) !== "object") {
                 return null;
             }
@@ -172,9 +203,9 @@
             }
 
             return table;
-        };
+        }
 
-        injector.execTable = function(table, data, ctx) {
+        function mthInjExecTable(table, data, ctx) {
             if(!table || typeof(table) !== "object") {
                 return null;
             }
@@ -192,11 +223,11 @@
             }
 
             return table;
-        };
+        }
 
-        //-------)>
+        //---)>
 
-        injector.onCaller = function(f) {
+        function mthOnCaller(f) {
             if(typeof(f) !== "function") {
                 throw new Error("onCaller: is not a function");
             }
@@ -204,21 +235,23 @@
             injOnCaller = f;
 
             return injector;
-        };
-
-        //-------)>
-
-        injector.createInstance = createInstance;
-
-        //-------------------------------]>
-
-        return injector;
+        }
 
         //--------[HELPERS]--------}>
 
-        function setValue(key, value) {
-            injValues = injValues || {};
-            injValues[key] = value;
+        function setVariable(name, value) {
+            injVariables = injVariables || {};
+            injVariables[name] = value;
+
+            return injector;
+        }
+
+        function delVariable(name) {
+            if(injVariables) {
+                delete injVariables[name];
+            }
+
+            return injector;
         }
     }
 })();

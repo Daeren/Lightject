@@ -43,6 +43,7 @@ function fLog(input, output, myBind) {
 }
 ```
 
+* Coverage: +
 * Benchmark: +
 * Browser: +
 
@@ -53,7 +54,7 @@ function fLog(input, output, myBind) {
 | createInstance  |                         | this                             |
 | onCaller        | callback(name, data)    | this or exception                |
 |                 | -                       |                                  |
-| value           | key, value              | this                             |
+| value           | name, value             | this                             |
 | service         | name, func              | this                             |
 | factory         | name, func              | this                             |
 |                 | -                       |                                  |
@@ -64,9 +65,6 @@ function fLog(input, output, myBind) {
 | execTable       | table, data[, ctx]      | overwritten table or null        |
 
 
-#### 2# of the fundamental modules
-[3# Aigis][2]
-
 ## License
 
 MIT
@@ -76,7 +74,6 @@ MIT
 
 
 [1]: http://666.io
-[2]: https://www.npmjs.com/package/aigis
 
 [cod_b]: https://img.shields.io/codacy/88b55f71c45a47838d24ed1e5fd2476c.svg
 [cod_l]: https://www.codacy.com/app/daeren/Lightject/dashboard
