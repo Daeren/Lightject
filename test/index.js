@@ -196,6 +196,55 @@ describe("Module: injector", function() {
         expect(result).to.equal(120);
     });
 
+    it("run (func.string) - value:service:factory", function() {
+        rInjector
+            .value("dx", 1)
+            .service("dy", function dy() { this.v = 5; })
+            .factory("dz", function dz() { return {"v": 10}; });
+
+        let result;
+
+        //----]>
+
+        result = rInjector.run((function(dx) {
+            return dx * 5;
+        }).toString());
+
+        expect(result).to.equal(5);
+
+        result = rInjector.run((function(dx, dy) {
+            return dx * 5 + dy.v;
+        }).toString());
+
+        expect(result).to.equal(10);
+
+        result = rInjector.run((function(dz, dx, dy) {
+            return dx * 5 + dy.v + dz.v;
+        }).toString());
+
+        expect(result).to.equal(20);
+
+        //----]>
+
+        result = rInjector.run(["dx", (function(tx) {
+            return tx * 5;
+        }).toString()]);
+
+        expect(result).to.equal(5);
+
+        result = rInjector.run(["dx", "dy", (function(tx, ty) {
+            return tx * 5 + ty.v;
+        }).toString()]);
+
+        expect(result).to.equal(10);
+
+        result = rInjector.run(["dz", "dx", "dy", (function(tz, tx, ty) {
+            return tx * 5 + ty.v + tz.v;
+        }).toString()]);
+
+        expect(result).to.equal(20);
+    });
+
     //-----------------]>
 
     it("funcInstance - value:service:factory", function() {
@@ -247,4 +296,19 @@ describe("Module: injector", function() {
         expect(result).to.equal(20);
     });
 
+    //-----------------]>
+
+    it("valueOf:toString", function() {
+        const func = function(dx) {
+            return dx * 5;
+        };
+
+        const strFunc = func.toString();
+        const injFunc = rInjector(func);
+
+        //-----]>
+
+        expect(injFunc + 1).to.equal(func + 1);
+        expect(injFunc + "").to.equal(strFunc);
+    });
 });

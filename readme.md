@@ -46,6 +46,7 @@ function fLog(input, output, myBind) {
 * Coverage: +
 * Benchmark: +
 * Browser: +
+* valueOf/toString: +
 
 
 | Method          | Arguments               | Return                           |
