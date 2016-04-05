@@ -182,7 +182,21 @@ var $injector;
             }
 
             function mthInjService(name, CFunc) {
-                return CFunc === null ? delVariable(name) : setVariable(name, new CFunc());
+                if(CFunc === null) {
+                    return delVariable(name);
+                }
+
+                //------]>
+
+                function CMirror() {
+                    injector.run(CFunc, null, this);
+                }
+
+                CMirror.prototype = CFunc.prototype;
+
+                //------]>
+
+                return setVariable(name, new CMirror());
             }
 
             function mthInjFactory(name, func) {

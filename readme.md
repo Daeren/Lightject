@@ -27,8 +27,8 @@ let print;
 
 $injector
     .value("x", 0)
-    .service("y", function() { this.v = 1; })
-    .factory("z", function() { return {"v": 3}; });
+    .service("y", function(x) { this.v = 1 + x; })
+    .factory("z", function(x, z) { return {"v": 3 + x + z.v}; });
     
 print = $injector(fLog, binds);
 print(data, ctx);

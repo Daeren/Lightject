@@ -48,8 +48,8 @@ describe("Module: injector", function() {
     it("run - value:service:factory", function() {
         rInjector
             .value("dx", 1)
-            .service("dy", function dy() { this.v = 5; })
-            .factory("dz", function dz() { return {"v": 10}; });
+            .service("dy", function dy(dx) { this.v = 4 + dx; })
+            .factory("dz", function dz(dx, dy) { return {"v": 4 + dx + dy.v}; });
 
         let result;
 
