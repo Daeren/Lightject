@@ -34,8 +34,6 @@ describe("Module: injector", function() {
 
     it("Require", function() {
         expect(rInjector).to.be.a("function");
-        expect($injector).to.be.a("function");
-
         expect(rInjector).to.equal($injector);
     });
 
@@ -311,4 +309,21 @@ describe("Module: injector", function() {
         expect(injFunc + 1).to.equal(func + 1);
         expect(injFunc + "").to.equal(strFunc);
     });
+
+    it("inj.vars", function() {
+        const func = function(dx, dy, $in) {
+            return $in;
+        };
+
+        const data      = {"dx": 2, "dy": 3};
+        const dataIn    = {"dx": 2, "dy": 3, "$in": 8};
+
+        const injFunc   = rInjector(func);
+
+        //-----]>
+
+        expect(injFunc(data)).to.equal(data);
+        expect(injFunc(dataIn)).to.equal(dataIn.$in);
+    });
+
 });

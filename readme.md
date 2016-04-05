@@ -49,6 +49,8 @@ function fLog(input, output, myBind) {
 * valueOf/toString: +
 
 
+#### Module
+
 | Method          | Arguments               | Return                           |
 |-----------------|-------------------------|----------------------------------|
 |                 | -                       |                                  |
@@ -64,6 +66,13 @@ function fLog(input, output, myBind) {
 | run             | f, data[, ctx]          | result of a function or null     |
 | runTable        | table, data[, ctx]      | table or null                    |
 | execTable       | table, data[, ctx]      | overwritten table or null        |
+
+
+#### System variables
+
+| Name      | Desc                                |
+|-----------|-------------------------------------|
+| $in       | Incoming data                       | 
 
 
 ## License

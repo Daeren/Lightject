@@ -5,6 +5,10 @@
 //
 //-----------------------------------------------------
 
+var $injector;
+
+//-----------------------------------------------------
+
 (function() {
     "use strict";
 
@@ -44,8 +48,8 @@
                 var i, arg;
 
                 var strFunc, strFuncArgs,
-                    isArrayFunc, isStrFunc,
-                    funcName, funcArgs, argsLen, callStack;
+                    isArrayFunc,
+                    funcName, funcArgs, funcBody, argsLen, callStack;
 
                 //-----------]>
 
@@ -69,13 +73,10 @@
                 }
 
                 if(typeof(srcFunc) === "string") {
-                    var funcBody;
-
                     strFunc = srcFunc;
                     strFuncArgs = extractFuncArgsStr(strFunc);
 
                     funcBody = strFunc.trim().slice(0, -1).replace(gReRemoveFuncHead, "");
-                    isStrFunc = true;
                 }
 
                 if(!strFunc) {
@@ -86,11 +87,7 @@
 
                 if(injOnCaller) {
                     funcName = strFunc.match(gReFuncName);
-                    funcName = funcName && funcName[1] ? funcName[1] : "[anon]";
-                }
-
-                if(isStrFunc) {
-                    srcFunc = createFunction(strFuncArgs, funcBody);
+                    funcName = funcName && funcName[1] || "[anon]";
                 }
 
                 if(!isArrayFunc) {
@@ -103,6 +100,10 @@
                     if(argsLen) {
                         callStack = new Array(argsLen);
                     }
+                }
+
+                if(funcBody) {
+                    srcFunc = createFunction(strFuncArgs, funcBody);
                 }
 
                 //-----------]>
@@ -134,7 +135,10 @@
                             (
                                 binds && hasOwnProperty.call(binds, arg) ? binds[arg] :
                                     (
-                                        injVariables && hasOwnProperty.call(injVariables, arg) ? injVariables[arg] : undefined
+                                        injVariables && hasOwnProperty.call(injVariables, arg) ? injVariables[arg] :
+                                            (
+                                                arg === "$in" ? data : undefined
+                                            )
                                     )
                             );
                     }
