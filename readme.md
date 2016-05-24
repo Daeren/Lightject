@@ -86,5 +86,5 @@ MIT
 
 [1]: http://666.io
 
-[cod_b]: https://img.shields.io/codacy/88b55f71c45a47838d24ed1e5fd2476c.svg
+[cod_b]: https://img.shields.io/codacy/5ce7382c312d4cd091acabd06bfcde15.svg
 [cod_l]: https://www.codacy.com/app/daeren/Lightject/dashboard
