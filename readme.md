@@ -73,7 +73,7 @@ function fLog(input, output, myBind) {
 
 | Name      | Desc                                |
 |-----------|-------------------------------------|
-| $in       | Incoming data                       | 
+| $in       |                                     | 
 
 
 ## License

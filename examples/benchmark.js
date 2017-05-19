@@ -18,10 +18,24 @@ var l, data, fCookie;
 //-----------------------------------------------------
 
 function f13($in, $out) { $out; ($in); }
+function f13x({$in, $out}) { $out; ($in); }
 
 //-----)>
 
 fCookie = $injector(f13);
+
+//-----------------]>
+
+l = 1000 * 1000 * 1;
+data = {"$out": console.log, "$in": "Simple start 0"};
+
+console.time("#0 | with Data");
+
+while(l--) {
+    f13x(data);
+}
+
+console.timeEnd("#0 | with Data");
 
 //-----------------]>
 

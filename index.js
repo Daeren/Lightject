@@ -45,7 +45,7 @@ var $injector;
             //--------------------]>
 
             function injector(srcFunc, binds) {
-                var i, arg;
+                var t, i, arg;
 
                 var strFunc, strFuncArgs,
                     isArrayFunc,
@@ -130,12 +130,17 @@ var $injector;
 
                     while(i--) {
                         arg = funcArgs[i];
+                        t = data && data[arg];
 
-                        callStack[i] = data && hasOwnProperty.call(data, arg) ? data[arg] :
+                        callStack[i] = data && typeof(t) !== "undefined" ? t :
                             (
-                                binds && hasOwnProperty.call(binds, arg) ? binds[arg] :
+                                t = binds && binds[arg],
+
+                                    binds && typeof(t) !== "undefined" ? t :
                                     (
-                                        injVariables && hasOwnProperty.call(injVariables, arg) ? injVariables[arg] :
+                                        t = injVariables && injVariables[arg],
+
+                                            injVariables && typeof(t) !== "undefined" ? t :
                                             (
                                                 arg === "$in" ? data : undefined
                                             )
@@ -143,8 +148,39 @@ var $injector;
                             );
                     }
 
-                    return srcFunc.apply(ctx || srcFunc, callStack);
+                    if(ctx) {
+                        return srcFunc.apply(ctx, callStack);
+                    }
+
+                    switch(argsLen) {
+                        case 1: return callWArgs1(srcFunc, callStack);
+                        case 2: return callWArgs2(srcFunc, callStack);
+                        case 3: return callWArgs3(srcFunc, callStack);
+                        case 4: return callWArgs4(srcFunc, callStack);
+
+                        default: srcFunc.apply(srcFunc, callStack);
+                    }
                 }
+
+                //----------]>
+
+                function callWArgs1(f, s) {
+                    return f(s[0]);
+                }
+
+                function callWArgs2(f, s) {
+                    return f(s[0], s[1]);
+                }
+
+                function callWArgs3(f, s) {
+                    return f(s[0], s[1], s[2]);
+                }
+
+                function callWArgs4(f, s) {
+                    return f(s[0], s[1], s[2], s[3]);
+                }
+
+                //----------]>
 
                 function mthCallerValueOf() {
                     return srcFunc.valueOf();
@@ -211,14 +247,12 @@ var $injector;
                 }
 
                 for(var name in table) {
-                    if(!hasOwnProperty.call(table, name)) {
-                        continue;
-                    }
+                    if(hasOwnProperty.call(table, name)) {
+                        var e = table[name];
 
-                    var e = table[name];
-
-                    if(typeof(e) === "function") {
-                        table[name] = injector(e, binds);
+                        if(typeof(e) === "function") {
+                            table[name] = injector(e, binds);
+                        }
                     }
                 }
 
@@ -238,14 +272,12 @@ var $injector;
                 }
 
                 for(var name in table) {
-                    if(!hasOwnProperty.call(table, name)) {
-                        continue;
-                    }
+                    if(hasOwnProperty.call(table, name)) {
+                        var e = table[name];
 
-                    var e = table[name];
-
-                    if(typeof(e) === "function") {
-                        injector.run(e, data, ctx);
+                        if(typeof(e) === "function") {
+                            injector.run(e, data, ctx);
+                        }
                     }
                 }
 
@@ -258,14 +290,12 @@ var $injector;
                 }
 
                 for(var name in table) {
-                    if(!hasOwnProperty.call(table, name)) {
-                        continue;
-                    }
+                    if(hasOwnProperty.call(table, name)) {
+                        var e = table[name];
 
-                    var e = table[name];
-
-                    if(typeof(e) === "function") {
-                        table[name] = injector.run(e, data, ctx);
+                        if(typeof(e) === "function") {
+                            table[name] = injector.run(e, data, ctx);
+                        }
                     }
                 }
 
