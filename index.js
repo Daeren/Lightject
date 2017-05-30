@@ -158,7 +158,7 @@ var $injector;
                         case 3: return callWArgs3(srcFunc, callStack);
                         case 4: return callWArgs4(srcFunc, callStack);
 
-                        default: srcFunc.apply(srcFunc, callStack);
+                        default: return srcFunc.apply(srcFunc, callStack);
                     }
                 }
 

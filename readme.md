@@ -1,4 +1,4 @@
-[![Codacy][cod_b]][cod_l]
+[![Codacy][cod_b]][cod_l] ![NodeSecurity][node_sec_b]
 
 `npm install lightject`
 
@@ -88,3 +88,5 @@ MIT
 
 [cod_b]: https://img.shields.io/codacy/5ce7382c312d4cd091acabd06bfcde15.svg
 [cod_l]: https://www.codacy.com/app/daeren/Lightject/dashboard
+
+[node_sec_b]: https://nodesecurity.io/orgs/xiii/projects/39b19817-5525-4498-93e5-a2887f20e901/badge
