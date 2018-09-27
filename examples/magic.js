@@ -22,8 +22,11 @@ var dfunc   = function dfunc(dx, dy, dz) { return "" + dx + dy.v + dz.v; };
 
 //--------)>
 
-$injector.onCaller(function logger(name, data) {
+$injector.onCaller(function logger(name, data, ctx, func) {
+    console.log("\n-------------------");
     console.log(name, ":", JSON.stringify(data));
+    console.log("ctx:", ctx);
+    console.log(func && func.toString() || "[empty]");
 });
 
 $injector
@@ -80,3 +83,19 @@ func = $injector(func);
 console.log(func(data, ctx));
 
 //------------]>
+
+$injector.run(function(x) {
+    console.log(x);
+}, {x: 6});
+
+$injector.run((x) => {
+    console.log(x);
+}, {x: 6});
+
+$injector.run((function(x) {
+    console.log(x);
+}).toString(), {x: 6});
+
+$injector.run(((x) => {
+    console.log(x);
+}).toString(), {x: 6});

@@ -34,7 +34,7 @@ print = $injector(fLog, binds);
 print(data, ctx);
 
 $injector.run(fLog, data, ctx);
-$injector.run(["x", "y", function(d1, d2) { return d1 + d2.v; }]);
+$injector.run(["x", "y", (d1, d2) => d1 + d2.v]);
 
 //-------------]>
 
@@ -51,22 +51,22 @@ function fLog(input, output, myBind) {
 
 #### Module
 
-| Method          | Arguments                   | Return                           |
-|-----------------|-----------------------------|----------------------------------|
-|                 | -                           |                                  |
-| createInstance  |                             | this                             |
-|                 | -                           |                                  |
-| onCaller        | callback(name, data, ctx)   | this or exception                |
-|                 | -                           |                                  |
-| value           | name, value                 | this                             |
-| service         | name, func                  | this                             |
-| factory         | name, func                  | this                             |
-|                 | -                           |                                  |
-| table           | table[, binds]              | table or null                    |
-|                 | -                           |                                  |
-| run             | f, data[, ctx]              | result of a function or null     |
-| runTable        | table, data[, ctx]          | table or null                    |
-| execTable       | table, data[, ctx]          | overwritten table or null        |
+| Method          | Arguments                         | Return                           |
+|-----------------|-----------------------------------|----------------------------------|
+|                 | -                                 |                                  |
+| createInstance  |                                   | this                             |
+|                 | -                                 |                                  |
+| onCaller        | callback(name, data, ctx, func)   | this or exception                |
+|                 | -                                 |                                  |
+| value           | name, value                       | this                             |
+| service         | name, func                        | this                             |
+| factory         | name, func                        | this                             |
+|                 | -                                 |                                  |
+| table           | table[, binds]                    | table or null                    |
+|                 | -                                 |                                  |
+| run             | f, data[, ctx]                    | result of a function or null     |
+| runTable        | table, data[, ctx]                | table or null                    |
+| execTable       | table, data[, ctx]                | overwritten table or null        |
 
 
 #### System variables

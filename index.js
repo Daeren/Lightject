@@ -15,8 +15,8 @@ var $injector;
     //-----------------------------------------------------
 
     (function() {
-        var gReMatchFuncArgs     = /^function\s*[^\(]*\(\s*([^\)]*)\)/m,
-            gReRemoveFuncHead    = /^function\s*[^\(]*\(\s*(?:[^\)]*)\)\s*\{/m,
+        var gReMatchFuncArgs     = /^function\s*[^\(]*\(\s*([^\)]*)\)|[^\(]*\(\s*([^\)]*)\)\s*\=\>/m,
+            gReRemoveFuncHead    = /^function\s*[^\(]*\(\s*(?:[^\)]*)\)\s*\{|[^\(]*\(\s*(?:[^\)]*)\)\s*\=\>\s*\{?/m,
             gReFilterFuncArgs    = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))|[\s\t\n]+/gm,
             gReSplitFuncArgs     = /,/,
 
@@ -119,7 +119,7 @@ var $injector;
 
                 function caller(data, ctx) {
                     if(injOnCaller) {
-                        injOnCaller(funcName, data, ctx);
+                        injOnCaller(funcName, data, ctx, srcFunc);
                     }
 
                     if(!argsLen || !data && !binds && !injVariables) {
@@ -336,7 +336,7 @@ var $injector;
 
         function extractFuncArgsStr(str) {
             var args = str && str.match(gReMatchFuncArgs);
-            args = args && args[1];
+            args = args && (args[1] || args[2]);
 
             return args ? args.replace(gReFilterFuncArgs, "") : "";
         }

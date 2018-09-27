@@ -130,6 +130,16 @@ describe("Module: injector", function() {
 
         expect(result).to.equal(105);
 
+        result = rInjector.run(["dw", "dx", (tw, tx) => {
+            return tx * 5 + tw;
+        }], {"dw": 100});
+
+        expect(result).to.equal(105);
+
+        result = rInjector.run(["dw", "dx", (tw, tx) => tx * 5 + tw], {"dw": 100});
+
+        expect(result).to.equal(105);
+
         result = rInjector.run(["dx", "dw", "dy", function(tx, tw, ty) {
             return tx * 5 + ty.v + tw;
         }], {"dw": 100});

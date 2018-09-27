@@ -1,6 +1,6 @@
 {
     "name": "lightject",
-    "version": "0.2.5",
+    "version": "0.3.0",
     "description": "Lightweight module for Dependency Injection",
 
     "homepage": "http://666.io",
@@ -29,9 +29,6 @@
     },
 
     "license": "MIT",
-    "engines": {
-        "node": ">= 0.4.0"
-    },
 
     "readme": "",
     "readmeFilename": "readme.md",

@@ -29,13 +29,13 @@ fCookie = $injector(f13);
 l = 1000 * 1000 * 1;
 data = {"$out": console.log, "$in": "Simple start 0"};
 
-console.time("#0 | with Data");
+console.time("#0 | with Data | func-d");
 
 while(l--) {
     f13x(data);
 }
 
-console.timeEnd("#0 | with Data");
+console.timeEnd("#0 | with Data | func-d");
 
 //-----------------]>
 
@@ -54,13 +54,13 @@ console.timeEnd("#1 | with Data");
 
 l = 1000 * 1000 * 1;
 
-console.time("#1 | without Data");
+console.time("#2 | without Data");
 
 while(l--) {
     fCookie();
 }
 
-console.timeEnd("#1 | without Data");
+console.timeEnd("#2 | without Data");
 
 //-----------------]>
 
